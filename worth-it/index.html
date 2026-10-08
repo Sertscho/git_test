@@ -3,9 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-</head>
-<body>
 <title>Worth It</title>
+<meta name="description" content="Gehalt eingeben, Preis eingeben und sehen, wie lange du dafür arbeiten musst.">
+<meta name="theme-color" content="#eceef3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12152a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Worth It">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=Figtree:wght@400;600&display=swap">
 <style>
@@ -16,6 +25,7 @@
   --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
   --body: "Figtree", system-ui, -apple-system, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --gutter: clamp(16px, 4vw, 40px); --gap: clamp(14px, 3vw, 24px); --pad: clamp(16px, 4vw, 24px);
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #12152a; --card: #1c2038; --ink: #eef0f7; --muted: #9aa1bd; --line: #2e3452;
@@ -25,56 +35,79 @@
   --accent: #f2ad2e; --accent-ink: #12152a; --good: #43c08a; --bad: #f0726a; color-scheme: dark }
 
 * { box-sizing: border-box }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 24px 48px }
-.wrap { max-width: 460px; margin: 0 auto; display: grid; gap: 20px }
-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px }
-h1 { font-family: var(--display); font-weight: 800; font-size: 2.4rem; letter-spacing: -0.03em; margin: 0; line-height: 1 }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100% }
+body {
+  margin: 0; min-height: 100vh; min-height: 100dvh;
+  background: var(--bg); color: var(--ink); font-family: var(--body);
+  font-size: clamp(15px, 1.2vw + 12px, 17px); line-height: 1.5;
+  /* side gutter grows with the screen and respects notches / rounded corners */
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  padding-top: calc(env(safe-area-inset-top, 0px) + clamp(16px, 4vw, 40px));
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(24px, 6vw, 56px));
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap { width: 100%; max-width: 520px; margin: 0 auto; display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1fr) }
+.wrap > * { min-width: 0 }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2rem, 8vw + .5rem, 3rem); letter-spacing: -0.03em; margin: 0; line-height: 1 }
 h1 span { color: var(--accent) }
 .tag { font-family: var(--mono); font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em }
-.panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: var(--pad) }
 .label { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 6px; display: block }
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 12px }
 .field { min-width: 0 }
-.inp { display: flex; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); padding: 0 12px }
+.inp { display: flex; align-items: center; min-height: 48px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); padding: 0 12px }
 .inp:focus-within { border-color: var(--accent) }
-.inp input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--mono); font-size: 1.05rem; padding: 10px 0; outline: none; font-variant-numeric: tabular-nums }
+.inp input { flex: 1; width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--mono); font-size: max(16px, 1.05rem); padding: 10px 0; outline: none; font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield }
+.inp input::-webkit-outer-spin-button, .inp input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
 .inp .unit { font-family: var(--mono); color: var(--muted); font-size: .9rem }
 .rate { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap }
 .rate b { font-family: var(--mono); font-size: 1.3rem; font-variant-numeric: tabular-nums }
 .rate small { color: var(--muted) }
 .price .inp { padding: 0 16px; border-width: 2px }
-.price .inp input { font-size: 2rem; font-weight: 600; padding: 12px 0 }
-.price .inp .unit { font-size: 1.4rem }
+.price .inp input { font-size: clamp(1.6rem, 7vw + .4rem, 2.4rem); font-weight: 600; padding: 10px 0 }
+.price .inp .unit { font-size: clamp(1.2rem, 4vw + .3rem, 1.6rem) }
 #what { margin-top: 10px }
-#what input { font-family: var(--body); font-size: 1rem }
+#what input { font-family: var(--body); font-size: max(16px, 1rem) }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px }
-.chip { font: 600 .85rem var(--body); border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer }
+.chip { font: 600 .85rem var(--body); min-height: 40px; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px; padding: 8px 14px; cursor: pointer; touch-action: manipulation }
 .chip:hover { border-color: var(--accent) }
-.stamp { background: var(--ink); color: var(--bg); border-radius: 14px; padding: 22px 20px; display: grid; gap: 6px }
+.stamp { background: var(--ink); color: var(--bg); border-radius: 14px; padding: clamp(18px, 5vw, 28px); display: grid; gap: 6px; align-content: start }
 .stamp .label { color: var(--bg); opacity: .65 }
-.big { font-family: var(--display); font-weight: 800; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; text-wrap: balance }
+.big { font-family: var(--display); font-weight: 800; font-size: clamp(2.2rem, 10vw + .5rem, 4rem); line-height: 1.02; letter-spacing: -0.02em; text-wrap: balance; overflow-wrap: anywhere }
 .big em { font-style: normal; color: var(--accent) }
 .sub { font-family: var(--mono); font-size: .9rem; opacity: .8 }
-.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px }
-.btn { font: 700 1rem var(--body); border-radius: 10px; padding: 12px; cursor: pointer; border: 2px solid transparent }
+.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 10px; margin-top: 12px }
+.btn { font: 700 1rem var(--body); min-height: 52px; border-radius: 12px; padding: 12px; cursor: pointer; border: 2px solid transparent; touch-action: manipulation }
+.btn:disabled { opacity: .45; cursor: default }
 .btn.yes { background: var(--accent); color: var(--accent-ink) }
 .btn.no { background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 40%, transparent) }
 .btn:focus-visible, .chip:focus-visible, .x:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
 h2 { font-family: var(--display); font-weight: 800; font-size: 1.3rem; margin: 0 0 10px }
 ul { list-style: none; margin: 0; padding: 0; display: grid }
-li { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line) }
+li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line) }
+@media (max-width: 360px) { li { grid-template-columns: auto minmax(0, 1fr) auto } li .t { grid-column: 2; grid-row: 2; text-align: left } }
 li:last-child { border-bottom: 0 }
 .pill { font: 600 .7rem var(--mono); text-transform: uppercase; letter-spacing: .06em; border-radius: 999px; padding: 3px 8px; border: 1px solid currentColor }
 .pill.y { color: var(--good) } .pill.n { color: var(--bad) }
 .name { min-width: 0; overflow-wrap: anywhere }
 .t { font-family: var(--mono); font-size: .85rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
-.x { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 4px }
+.x { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.3rem; min-width: 44px; min-height: 44px; margin: -8px -10px -8px 0; touch-action: manipulation }
 .empty { color: var(--muted); margin: 0 }
 .totals { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: .9rem; color: var(--muted) }
-.totals b { color: var(--good); font-family: var(--mono) }
+.totals b { color: var(--good); font-family: var(--mono); white-space: nowrap }
 .note { font-size: .8rem; color: var(--muted); margin: 0 }
+/* Tablets / desktop / phones in landscape: inputs left, result + list right */
+@media (min-width: 760px) {
+  .wrap { max-width: 1040px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "head head" "salary stamp" "price list" "note list"; align-items: start }
+  header { grid-area: head } #s-salary { grid-area: salary } #s-price { grid-area: price }
+  .stamp { grid-area: stamp; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px) } #s-list { grid-area: list } .note { grid-area: note }
+}
 @media (prefers-reduced-motion: no-preference) { .big { transition: color .2s } }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <header>
@@ -82,15 +115,15 @@ li:last-child { border-bottom: 0 }
     <span class="tag">Preis → Arbeitszeit</span>
   </header>
 
-  <section class="panel" aria-label="Dein Gehalt">
+  <section class="panel" id="s-salary" aria-label="Dein Gehalt">
     <div class="row">
       <div class="field">
         <label class="label" for="salary">Netto pro Monat</label>
-        <div class="inp"><input id="salary" type="number" inputmode="decimal" min="0" step="50" value="2800"><span class="unit">€</span></div>
+        <div class="inp"><input id="salary" type="number" enterkeyhint="next" inputmode="decimal" min="0" step="50" value="2800"><span class="unit">€</span></div>
       </div>
       <div class="field">
         <label class="label" for="hours">Stunden / Woche</label>
-        <div class="inp"><input id="hours" type="number" inputmode="decimal" min="1" max="80" step="0.5" value="40"><span class="unit">h</span></div>
+        <div class="inp"><input id="hours" type="number" enterkeyhint="next" inputmode="decimal" min="1" max="80" step="0.5" value="40"><span class="unit">h</span></div>
       </div>
     </div>
     <div class="rate">
@@ -99,10 +132,10 @@ li:last-child { border-bottom: 0 }
     </div>
   </section>
 
-  <section class="panel price" aria-label="Was willst du kaufen?">
+  <section class="panel price" id="s-price" aria-label="Was willst du kaufen?">
     <label class="label" for="price">Was kostet es?</label>
-    <div class="inp"><input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="129.99"><span class="unit">€</span></div>
-    <div class="inp" id="what"><input id="item" type="text" maxlength="60" placeholder="Was ist es? (optional)" value="Sneaker"></div>
+    <div class="inp"><input id="price" type="number" enterkeyhint="done" inputmode="decimal" min="0" step="0.01" value="129.99"><span class="unit">€</span></div>
+    <div class="inp" id="what"><input id="item" type="text" enterkeyhint="done" autocomplete="off" maxlength="60" placeholder="Was ist es? (optional)" value="Sneaker"></div>
     <div class="chips" aria-label="Beispiele">
       <button class="chip" type="button" data-n="Kaffee to go" data-p="4.20">Kaffee 4,20 €</button>
       <button class="chip" type="button" data-n="Sneaker" data-p="129.99">Sneaker 130 €</button>
@@ -121,7 +154,7 @@ li:last-child { border-bottom: 0 }
     </div>
   </section>
 
-  <section class="panel" aria-label="Deine Entscheidungen">
+  <section class="panel" id="s-list" aria-label="Deine Entscheidungen">
     <h2>Deine Entscheidungen</h2>
     <ul id="list"></ul>
     <p class="empty" id="empty">Noch nichts gespeichert. Tipp auf „Worth it“ oder „Lieber nicht“, um eine Entscheidung festzuhalten.</p>
@@ -161,6 +194,7 @@ li:last-child { border-bottom: 0 }
     const perDay = num($('hours').value) / 5;
     const days = hours / perDay;
     if (days < 0.95) return `${Math.round(days * 100)} % eines Arbeitstags`;
+    if (days < 1.05) return '≈ 1 Arbeitstag';
     if (days < 5) return `≈ ${days.toFixed(1).replace('.', ',')} Arbeitstage`;
     const weeks = days / 5;
     if (weeks < 4.3) return `≈ ${weeks.toFixed(1).replace('.', ',')} Arbeitswochen`;
@@ -219,6 +253,8 @@ li:last-child { border-bottom: 0 }
   });
   $('yes').onclick = () => decide(true);
   $('no').onclick = () => decide(false);
+
+  document.querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') i.blur(); }));
 
   render(); renderList();
 })();
