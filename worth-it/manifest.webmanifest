@@ -1,0 +1,16 @@
+{
+  "name": "Worth It",
+  "short_name": "Worth It",
+  "description": "Gehalt eingeben, Preis eingeben und sehen, wie lange du dafür arbeiten musst.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#12152a",
+  "theme_color": "#1b2036",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
