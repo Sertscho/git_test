@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Worth It</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=Figtree:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column like a punched time card — setup strip, big price input, result "stamp", saved list */
+:root {
+  --bg: #eceef3; --card: #ffffff; --ink: #1b2036; --muted: #626a85; --line: #d5d9e4;
+  --accent: #e39a12; --accent-ink: #1b2036; --good: #1f8a5b; --bad: #c2413a;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12152a; --card: #1c2038; --ink: #eef0f7; --muted: #9aa1bd; --line: #2e3452;
+  --accent: #f2ad2e; --accent-ink: #12152a; --good: #43c08a; --bad: #f0726a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12152a; --card: #1c2038; --ink: #eef0f7; --muted: #9aa1bd; --line: #2e3452;
+  --accent: #f2ad2e; --accent-ink: #12152a; --good: #43c08a; --bad: #f0726a; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 24px 48px }
+.wrap { max-width: 460px; margin: 0 auto; display: grid; gap: 20px }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px }
+h1 { font-family: var(--display); font-weight: 800; font-size: 2.4rem; letter-spacing: -0.03em; margin: 0; line-height: 1 }
+h1 span { color: var(--accent) }
+.tag { font-family: var(--mono); font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px }
+.label { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 6px; display: block }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.field { min-width: 0 }
+.inp { display: flex; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); padding: 0 12px }
+.inp:focus-within { border-color: var(--accent) }
+.inp input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--mono); font-size: 1.05rem; padding: 10px 0; outline: none; font-variant-numeric: tabular-nums }
+.inp .unit { font-family: var(--mono); color: var(--muted); font-size: .9rem }
+.rate { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap }
+.rate b { font-family: var(--mono); font-size: 1.3rem; font-variant-numeric: tabular-nums }
+.rate small { color: var(--muted) }
+.price .inp { padding: 0 16px; border-width: 2px }
+.price .inp input { font-size: 2rem; font-weight: 600; padding: 12px 0 }
+.price .inp .unit { font-size: 1.4rem }
+#what { margin-top: 10px }
+#what input { font-family: var(--body); font-size: 1rem }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px }
+.chip { font: 600 .85rem var(--body); border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer }
+.chip:hover { border-color: var(--accent) }
+.stamp { background: var(--ink); color: var(--bg); border-radius: 14px; padding: 22px 20px; display: grid; gap: 6px }
+.stamp .label { color: var(--bg); opacity: .65 }
+.big { font-family: var(--display); font-weight: 800; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; text-wrap: balance }
+.big em { font-style: normal; color: var(--accent) }
+.sub { font-family: var(--mono); font-size: .9rem; opacity: .8 }
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px }
+.btn { font: 700 1rem var(--body); border-radius: 10px; padding: 12px; cursor: pointer; border: 2px solid transparent }
+.btn.yes { background: var(--accent); color: var(--accent-ink) }
+.btn.no { background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 40%, transparent) }
+.btn:focus-visible, .chip:focus-visible, .x:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
+h2 { font-family: var(--display); font-weight: 800; font-size: 1.3rem; margin: 0 0 10px }
+ul { list-style: none; margin: 0; padding: 0; display: grid }
+li { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line) }
+li:last-child { border-bottom: 0 }
+.pill { font: 600 .7rem var(--mono); text-transform: uppercase; letter-spacing: .06em; border-radius: 999px; padding: 3px 8px; border: 1px solid currentColor }
+.pill.y { color: var(--good) } .pill.n { color: var(--bad) }
+.name { min-width: 0; overflow-wrap: anywhere }
+.t { font-family: var(--mono); font-size: .85rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
+.x { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 4px }
+.empty { color: var(--muted); margin: 0 }
+.totals { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: .9rem; color: var(--muted) }
+.totals b { color: var(--good); font-family: var(--mono) }
+.note { font-size: .8rem; color: var(--muted); margin: 0 }
+@media (prefers-reduced-motion: no-preference) { .big { transition: color .2s } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Worth<span>.</span>It</h1>
+    <span class="tag">Preis → Arbeitszeit</span>
+  </header>
+
+  <section class="panel" aria-label="Dein Gehalt">
+    <div class="row">
+      <div class="field">
+        <label class="label" for="salary">Netto pro Monat</label>
+        <div class="inp"><input id="salary" type="number" inputmode="decimal" min="0" step="50" value="2800"><span class="unit">€</span></div>
+      </div>
+      <div class="field">
+        <label class="label" for="hours">Stunden / Woche</label>
+        <div class="inp"><input id="hours" type="number" inputmode="decimal" min="1" max="80" step="0.5" value="40"><span class="unit">h</span></div>
+      </div>
+    </div>
+    <div class="rate">
+      <span>Dein Stundenlohn</span>
+      <span><b id="rate">–</b> <small>netto</small></span>
+    </div>
+  </section>
+
+  <section class="panel price" aria-label="Was willst du kaufen?">
+    <label class="label" for="price">Was kostet es?</label>
+    <div class="inp"><input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="129.99"><span class="unit">€</span></div>
+    <div class="inp" id="what"><input id="item" type="text" maxlength="60" placeholder="Was ist es? (optional)" value="Sneaker"></div>
+    <div class="chips" aria-label="Beispiele">
+      <button class="chip" type="button" data-n="Kaffee to go" data-p="4.20">Kaffee 4,20 €</button>
+      <button class="chip" type="button" data-n="Sneaker" data-p="129.99">Sneaker 130 €</button>
+      <button class="chip" type="button" data-n="Smartphone" data-p="999">Smartphone 999 €</button>
+      <button class="chip" type="button" data-n="Urlaub" data-p="1800">Urlaub 1.800 €</button>
+    </div>
+  </section>
+
+  <section class="stamp" aria-live="polite">
+    <span class="label">Dafür arbeitest du</span>
+    <div class="big" id="big">–</div>
+    <div class="sub" id="sub"></div>
+    <div class="verdict">
+      <button class="btn yes" type="button" id="yes">Worth it</button>
+      <button class="btn no" type="button" id="no">Lieber nicht</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Deine Entscheidungen">
+    <h2>Deine Entscheidungen</h2>
+    <ul id="list"></ul>
+    <p class="empty" id="empty">Noch nichts gespeichert. Tipp auf „Worth it“ oder „Lieber nicht“, um eine Entscheidung festzuhalten.</p>
+    <div class="totals" id="totals" hidden></div>
+  </section>
+
+  <p class="note">Rechnung: Netto × 12 ÷ (Wochenstunden × 52). Ein Arbeitstag = Wochenstunden ÷ 5. Alles bleibt lokal in deinem Browser.</p>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const eur = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+  const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) && n > 0 ? n : 0; };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('worthit.' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem('worthit.' + k, JSON.stringify(v)); } catch {} }
+  };
+
+  let history = store.get('history', []);
+  const saved = store.get('settings', null);
+  if (saved) { $('salary').value = saved.salary; $('hours').value = saved.hours; }
+
+  function hourlyRate() {
+    const s = num($('salary').value), h = num($('hours').value);
+    return s && h ? (s * 12) / (h * 52) : 0;
+  }
+
+  // Formats a duration in hours as "3 Std 12 Min", plus workdays/weeks when it gets large
+  function fmt(hours) {
+    const total = Math.round(hours * 60);
+    const h = Math.floor(total / 60), m = total % 60;
+    if (h === 0) return { main: `${m} Min`, words: total };
+    return { main: m ? `${h} Std ${m} Min` : `${h} Std`, words: total };
+  }
+  function context(hours) {
+    const perDay = num($('hours').value) / 5;
+    const days = hours / perDay;
+    if (days < 0.95) return `${Math.round(days * 100)} % eines Arbeitstags`;
+    if (days < 5) return `≈ ${days.toFixed(1).replace('.', ',')} Arbeitstage`;
+    const weeks = days / 5;
+    if (weeks < 4.3) return `≈ ${weeks.toFixed(1).replace('.', ',')} Arbeitswochen`;
+    return `≈ ${(weeks / 4.33).toFixed(1).replace('.', ',')} Monatsgehälter`;
+  }
+
+  function render() {
+    const rate = hourlyRate();
+    $('rate').textContent = rate ? eur.format(rate) + ' / h' : '–';
+    const p = num($('price').value);
+    const ok = rate && p;
+    $('yes').disabled = $('no').disabled = !ok;
+    if (!ok) { $('big').textContent = '–'; $('sub').textContent = 'Gib Gehalt, Stunden und Preis ein.'; return; }
+    const hrs = p / rate;
+    $('big').innerHTML = `<em>${fmt(hrs).main}</em>`;
+    $('sub').textContent = `${context(hrs)} · ${eur.format(p)}`;
+  }
+
+  function renderList() {
+    const ul = $('list'); ul.innerHTML = '';
+    $('empty').hidden = history.length > 0;
+    history.forEach((e, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="pill ${e.yes ? 'y' : 'n'}">${e.yes ? 'Ja' : 'Nein'}</span>
+        <span class="name"></span><span class="t">${fmt(e.hours).main}</span>
+        <button class="x" type="button" aria-label="Eintrag löschen">×</button>`;
+      li.querySelector('.name').textContent = `${e.name} · ${eur.format(e.price)}`;
+      li.querySelector('.x').onclick = () => { history.splice(i, 1); store.set('history', history); renderList(); };
+      ul.appendChild(li);
+    });
+    const skipped = history.filter(e => !e.yes);
+    const t = $('totals');
+    t.hidden = skipped.length === 0;
+    if (skipped.length) {
+      const money = skipped.reduce((a, e) => a + e.price, 0);
+      const hrs = skipped.reduce((a, e) => a + e.hours, 0);
+      t.innerHTML = `Durch „Lieber nicht“ gespart: <b>${eur.format(money)}</b> = <b>${fmt(hrs).main}</b> Arbeitszeit`;
+    }
+  }
+
+  function decide(yes) {
+    const rate = hourlyRate(), p = num($('price').value);
+    if (!rate || !p) return;
+    history.unshift({ name: $('item').value.trim() || 'Ohne Namen', price: p, hours: p / rate, yes });
+    history = history.slice(0, 50);
+    store.set('history', history);
+    renderList();
+  }
+
+  ['salary', 'hours'].forEach(id => $(id).addEventListener('input', () => {
+    store.set('settings', { salary: $('salary').value, hours: $('hours').value }); render();
+  }));
+  $('price').addEventListener('input', render);
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+    $('price').value = c.dataset.p; $('item').value = c.dataset.n; render();
+  });
+  $('yes').onclick = () => decide(true);
+  $('no').onclick = () => decide(false);
+
+  render(); renderList();
+})();
+</script>
+
+</body>
+</html>
